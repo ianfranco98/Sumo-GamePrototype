@@ -1,0 +1,131 @@
+njb24/7/2020 2:29hs ===========================================================================================
+============================================================================================================
+
+    *** Para pensar a futuro ***:
+
+    * Ver que onda con las referencias al objeto "Player", quizas se puedan mover a un singleton y
+      así limpiar un poco las funciones "Setup" que requieran dicha referencia.
+    
+    * (resuelto el: 1/8) 
+      Hay que seguir documentandose sobre MLAPI para poder realizar mejoras de rendimiento en
+      conexión LAN. Lo mas probable es que el juego lo requiera. Testear lo que hay actualmente.
+
+
+
+    Para hacer en un futuro cercano:
+
+    * Implementar algún boceto para la pantalla previa a juego en LAN (botones de conexión HOST o CLIENT).
+
+    * Ir jugando en modo LAN a ver como va la experiencia de juego.
+
+    * Buscar posibles problemas con el evento de ataque conectado que se ejecuta varias veces.
+
+1/8/2020 4:09hs ============================================================================================
+============================================================================================================
+
+    Ya pude mejorar el script "PlayerNetworkedVar" y aparentemente hubo mejora en la velocidad de envio y
+    recepción en el modo LAN. Queda pendiente hacer pruebas en teléfonos.
+    
+    Hay que pensar como implementar el evento "Grab Battle" y el frame freeze.
+
+3/8/2020 2:14hs ============================================================================================
+============================================================================================================
+
+    Anduve probando el shader que ví en el canal de Jettelly (ToonShader), tambien aproveché y cambié todos
+    los colores a unos mas pastel. No me convence del todo pero queda mejor que lo que habia antes.
+
+    Agregué un suavizado a la cámara y una de giro sobre el eje.
+
+    Agregué una animación a la cámara del menu principal.
+
+
+
+    *** Para pensar a futuro ***:
+
+    * Hay mucho para laburar en el modo LAN:
+      - Manejar excepciones por interrupciones en la conexión.
+      - Cerrar correctamente los threads al cambiar de escena.
+      - Limpiar, renombrar y, si es necesario, borrarlo y mover a otro lado las funcionalidades del script
+       "NetworkConfigDisplay".
+      - Triggerear correctamente los eventos de OnGameLogic "STARTING" y "FIGHT_ENDED".
+      - Limpiar las corrutinas script "LocalMultiplayerMode" y utilizar eventos de networking de MLAPI.
+
+    * Pensar como conseguir feedback, sobre todo del gameplay.
+
+
+
+    Para hacer en un futuro cercano:
+
+    * Bocetar GUI.
+
+    * Crear un prefab base para los botones.
+
+    * Armar algún video para mostrar en Instagram y cualquier otro lugar.
+
+4/8/2020 3:19hs ============================================================================================
+============================================================================================================
+
+    Limpie el script "NetworkConfigDisplay" y lo renombre como "NetworkModeHandler", aunque estoy conside-
+    rando borrarlo y mover sus funcionalidades a "LocalMultiplayerMode", ya que solo cambia el modo de
+    networking y guarda la ip del host.
+
+    Limpie un poco el script "NetworkedPlayerAutoConfig".
+
+    Mientras modificaba "LocalMultiplayerMode" lo limpié. Me sirvió ver el ejemplo de Pong para poder hacer
+    esos cambios.
+
+    Ahora los prefab de los jugadores no se instancian ni bien entran a algún modo, sino que lo hacen cuando
+    se realiza la conexión entre ambos jugadores. Sin embargo me dió la sensación de que ese cambio hizo que
+    el juego tuviese un ligero aumento de lag, aunque no estoy del todo seguro. También ahora aparece un
+    error con la transform del oponente en el host (ver DelayedInitializeHostGame()).
+
+    Hay un error en UDPClient pero se soluciona facil.
+
+5/8/2020 3:40hs ============================================================================================
+============================================================================================================
+
+    En discord me dijeron que habia un callback que se triggerea cuando se desconecta un cliente, asi que es-
+    toy usando eso para terminar la partida LAN y devolver a los jugadores al menú principal.
+
+    Hay un error en la siguiente linea:
+
+    byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
+
+    Está presente en ambos script UDP y solo ocurre cuando se desconecta la partida LAN y se vuelve entrar al
+    modo multiplayer para seguir jugando. Me extraña que ocurra dado que es un objeto local a ese thread, de-
+    bería destruirse al terminar pero parece que se mantiene activo, no se.
+
+    Agregue el color del jugador 2 en el script "NetworkedPlayerAutoConfig".
+
+    Ahora la cámara vuelve a realizar la animación de inicio cuando se reinicia la pelea. Habria que
+    reubicar a los jugadores a su posición original.
+    
+6/8/2020 0:30hs ============================================================================================
+============================================================================================================
+
+    Pude arreglar el error de ayer pero al hacer las pruebas en teléfonos no pude lograr conectarme, ni bien
+    confirmaba la conexión el juego volvia al menú, supongo que el cliente logra conectarse un instante y
+    luego se desconecta.
+
+    Hay que comenzar con la parte de diseño de interfaz y pulimiento de mecánicas.
+
+7/8/2020 5:43hs ============================================================================================
+============================================================================================================
+
+    Volví a probar el modo LAN desde distintas PCs y ahora sí se conecta exceptuando que no pude lograr que
+    el otro sea host. No se.
+
+    Ahí diseñé la primera versión de botones de la UI junto con el prefab base.
+
+    Para hacer en un futuro cercano:
+
+      * Elegir una paleta de colores para todo el juego.
+
+      * Empezar a armar las animaciones de la UI.
+
+      * Pensar en un título, bocetar diseño planear alguna animación con Text Mesh Pro.
+
+-/-/2020 -:--hs ============================================================================================
+============================================================================================================
+
+

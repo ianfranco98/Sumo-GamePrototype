@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 472f5445fecb1054ebdb116f9f0066e2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - leanTouchPrefab: {fileID: 549596837676869023, guid: a71852c692f25614bb2cdd949bdffb3f,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
