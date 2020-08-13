@@ -16,7 +16,8 @@ public class PlayersEventHandler : MonoBehaviour
 
     void Awake() => enabled = false;
 
-    public virtual void Setup(Transform playerOne, Transform playerTwo, Vector3 arenaCenter = new Vector3()){
+    public virtual void Setup(Transform playerOne, Transform playerTwo, Vector3 arenaCenter = new Vector3())
+    {
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
 
@@ -30,40 +31,47 @@ public class PlayersEventHandler : MonoBehaviour
         enabled = true;
     }
 
-    public virtual void PositionPlayersToOrigin(){
+    public virtual void PositionPlayersToOrigin()
+    {
         playerOneSM.GoToOriginalPosition();
         playerTwoSM.GoToOriginalPosition();
     }
 
-    public virtual void TellPlayersWhoWin(OnGameFightLogic.Player p){
-        switch(p){
+    public virtual void TellPlayersWhoWin(OnGameFightLogic.Player p)
+    {
+        switch (p)
+        {
             case OnGameFightLogic.Player.ONE:
-                playerOneSM.ForceChangeState((int) PlayerStateMachine.State.WIN);
-                playerTwoSM.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-            break;
+                playerOneSM.ForceChangeState((int)PlayerStateMachine.State.WIN);
+                playerTwoSM.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                break;
             case OnGameFightLogic.Player.TWO:
-                playerOneSM.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-                playerTwoSM.ForceChangeState((int) PlayerStateMachine.State.WIN);
-            break;
+                playerOneSM.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                playerTwoSM.ForceChangeState((int)PlayerStateMachine.State.WIN);
+                break;
             case OnGameFightLogic.Player.BOTH:
-                playerOneSM.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-                playerTwoSM.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-            break;
+                playerOneSM.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                playerTwoSM.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                break;
         }
     }
 
-    public void PushPlayer1() => playerOneSM.ChangeState((int) PlayerStateMachine.Event.BEING_PUSHED);
-    public virtual void PushPlayer2() => playerTwoSM.ChangeState((int) PlayerStateMachine.Event.BEING_PUSHED);
+    public void PushPlayer1() => playerOneSM.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
+    public virtual void PushPlayer2() => playerTwoSM.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
 
-    public virtual int WhoHasGotStrongestPush(){
+    public virtual int WhoHasGotStrongestPush()
+    {
         float p1Force = playerOneSM.GetCurrentForce();
         float p2Force = playerTwoSM.GetCurrentForce();
 
         int winner = 0;
 
-        if (p1Force > p2Force + tieRange){
+        if (p1Force > p2Force + tieRange)
+        {
             winner = 1;
-        } else if (p2Force > p1Force + tieRange){
+        }
+        else if (p2Force > p1Force + tieRange)
+        {
             winner = 2;
         }
         return winner;
@@ -72,6 +80,8 @@ public class PlayersEventHandler : MonoBehaviour
     public Transform GetP1Transform() => playerOne;
     public Transform GetP2Transform() => playerTwo;
     public Vector3 GetDirectionVector() => (GetP1Transform().position - GetP2Transform().position).normalized;
+    public int GetPushCountP1() => playerOneSM.GetPushCount();
+    public virtual int GetPushCountP2() => playerOneSM.GetPushCount();
     public virtual bool PlayersAreColliding() => Vector3.Distance(playerOne.position, playerTwo.position) <= minDistCollision;
     public bool OutOfArenaP1() => Vector3.Distance(playerOne.position, arenaCenter) > arenaRadius;
     public bool OutOfArenaP2() => Vector3.Distance(playerTwo.position, arenaCenter) > arenaRadius;

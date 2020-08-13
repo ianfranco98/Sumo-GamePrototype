@@ -22,11 +22,12 @@ public class PlayerNetworkedVar : NetworkedBehaviour
 
     int _state;
     int _previousState;
+    int _pushCount;
 
     List<ulong> listEnemyID;
     ulong enemyID;
 
-    bool initialized;
+    bool clientModeEnabled;
 
     void Start()
     {
@@ -39,17 +40,17 @@ public class PlayerNetworkedVar : NetworkedBehaviour
     {
 
         playerReference = gameObject.GetComponent<PlayerStateMachine>();
-        initialized = true;
+        clientModeEnabled = true;
 
     }
 
     void Update()
     {
-        if (initialized)
+        if (clientModeEnabled)
         {
             _state = (int)playerReference.GetState();
 
-            SendServerMessage(UpdateNetworkedState, _state);
+            if (_state != _previousState) SendServerMessage(UpdateNetworkedState, _state);
 
             _previousState = (int)playerReference.GetState();
 
@@ -62,6 +63,8 @@ public class PlayerNetworkedVar : NetworkedBehaviour
     public int GetState() => _state;
     public float GetCurrentForce() => force.Value;
 
+    // A pedido del host
+    public void UpdatePushCount() => InvokeClientRpcOnEveryoneExcept(RequestPushCount, NetworkingManager.Singleton.LocalClientId);
     public void ChangeState(int newEvent) => SendMessage(ChangeNetworkedState, newEvent);
     public void ForceChangeState(int newState) => SendMessage(ForceNetworkedState, newState);
     public void GoToOriginalPosition() => InvokeClientRpcOnEveryoneExceptPerformance(CallGoToOriginalPosition, NetworkingManager.Singleton.LocalClientId, PooledBitStream.Get());
@@ -75,6 +78,31 @@ public class PlayerNetworkedVar : NetworkedBehaviour
         using (PooledBitReader reader = PooledBitReader.Get(stream))
         {
             _state = reader.ReadByte();
+        }
+    }
+
+    [ServerRPC]
+    private void SubmitPushCount(ulong clientId, Stream stream)
+    {
+        if (!enabled) return;
+        using (PooledBitReader reader = PooledBitReader.Get(stream))
+        {
+            _pushCount = reader.ReadByte();
+        }
+    }
+
+    [ClientRPC]
+    private void RequestPushCount()
+    {
+        if (!enabled) return;
+        using (PooledBitStream stream = PooledBitStream.Get())
+        {
+            using (PooledBitWriter writer = PooledBitWriter.Get(stream))
+            {
+                writer.WriteInt16((short)playerReference.GetPushCount());
+            }
+            InvokeServerRpcPerformance(SubmitPushCount, stream);
+
         }
     }
 

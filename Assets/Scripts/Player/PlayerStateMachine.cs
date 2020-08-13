@@ -10,6 +10,7 @@ using DG.Tweening;
 
 public class PlayerStateMachine : Character
 {   
+    int pushCount; 
     float pushForce;
     float pushDecreasementCount;
     public float pushDistanceScalar = 7;
@@ -221,6 +222,8 @@ public class PlayerStateMachine : Character
         //Debug.Log(originalPosition);
     }
 
+    public void AddPushCount() => pushCount++;
+    public int GetPushCount() => pushCount;
     public void SetMovInputDirection(Vector3 input) => movInputDirection = new Vector3(input.x, 0, input.z);
     public void SetOriginalPosition(Vector3 pos) => originalPosition = pos;
     public float GetSize() => size;
