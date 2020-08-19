@@ -115,6 +115,18 @@ public class CustomCamera : MonoBehaviour
         mainCamera.DOOrthoSize(zoom - 5, 2f).SetDelay(0.1f).SetEase(Ease.InOutCubic);
     }
 
+    public void GrabBattleSwing()
+    {
+        followModeEnabled = false;
+
+        Vector3 dir = playerOne.position - playerTwo.position;
+        Vector2 rad = Cartesian2Polar(dir.x, dir.z);
+
+        float deg = rad.y > 0 ? Mathf.Rad2Deg * rad.y : Mathf.Rad2Deg * rad.y + 360;
+
+        transform.DORotate(new Vector3(transform.rotation.x, -(deg - 180), transform.rotation.x), 2).OnComplete(GrabBattleSwingCompleted);
+    }
+
     public void FollowPlayers()
     {
         followModeEnabled = true;
@@ -152,7 +164,11 @@ public class CustomCamera : MonoBehaviour
         zoom = mainCamera.orthographicSize;
     }
 
-
+    void GrabBattleSwingCompleted()
+    {
+        followModeEnabled = true;
+        transform.eulerAngles = Vector3.zero;
+    }
 
 
     float map(float value, float start1, float stop1, float start2, float stop2)
@@ -165,6 +181,10 @@ public class CustomCamera : MonoBehaviour
         return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
     }
 
+    public static Vector2 Cartesian2Polar(float x, float y)
+    {
+        return new Vector2(Mathf.Sqrt(x * x + y * y), Mathf.Atan2(y, x));
+    }
 
 
 }

@@ -32,7 +32,7 @@ public class OnGameFightLogic : MonoBehaviour
     State currentState = State.INVALID;
     State initialState = State.STARTING;
     Player currentWinner = Player.NONE;
-    int initialScore = 1;
+    int initialScore = 3;
     int playerOneScore, playerTwoScore;
 
     void Awake() => enabled = false;
@@ -71,6 +71,7 @@ public class OnGameFightLogic : MonoBehaviour
                 case State.FIGHT_ENDED:
                     break;
                 case State.GRAB_BATTLE:
+                    eventHandler.TellPlayersGrabBattleIsStarting();
                     StartCoroutine(FinalizeGrabBattle());
                     break;
 
@@ -92,27 +93,33 @@ public class OnGameFightLogic : MonoBehaviour
             case State.ON_GAME:
                 if (eventHandler.PlayersAreColliding())
                 {
+                    
+                    bool exitOnGameState = false;
                     if (eventHandler.IsAttackingP1() && !eventHandler.IsAttackingP2()) eventHandler.PushPlayer2();
-                    if (eventHandler.IsAttackingP2() && !eventHandler.IsAttackingP1()) eventHandler.PushPlayer1();
-                }
-
-
-                if (eventHandler.BothPlayersAttackAndCollide())
-                {
-
-                    switch (eventHandler.WhoHasGotStrongestPush())
+                    else if (eventHandler.IsAttackingP2() && !eventHandler.IsAttackingP1()) eventHandler.PushPlayer1();
+                    else if (eventHandler.BothPlayersAttackAndCollide())
                     {
-                        case 0:// Si hubo empate
-                            ChangeState(State.GRAB_BATTLE);
-                            break;
-                        case 1:
-                            eventHandler.PushPlayer2();
-                            break;
-                        case 2:
-                            eventHandler.PushPlayer1();
-                            break;
+                        switch (eventHandler.WhoHasGotStrongestPush())
+                        {
+                            case 0:// Si hubo empate
+                                ChangeState(State.GRAB_BATTLE);
+                                exitOnGameState = true;
+                                break;
+                            case 1:
+                                eventHandler.PushPlayer2();
+                                break;
+                            case 2:
+                                eventHandler.PushPlayer1();
+                                break;
+                        }
                     }
+
+                    if (exitOnGameState) break;
+
                 }
+
+
+
 
                 bool playerOneLose = eventHandler.OutOfArenaP1();
                 bool playerTwoLose = eventHandler.OutOfArenaP2();
@@ -175,19 +182,19 @@ public class OnGameFightLogic : MonoBehaviour
         ChangeState(State.STARTING);
     }
 
-    int DecideWhoWinGrabBattle()
+    Player DecideWhoWinGrabBattle()
     {
         int pushCountP1 = eventHandler.GetPushCountP1();
         int pushCountP2 = eventHandler.GetPushCountP2();
         int whoWin = pushCountP1 - pushCountP2;
-        int result = 0;
+        Player result = Player.BOTH;
         if (whoWin > 0)
         {
-            result = 1;
+            result = Player.ONE;
         }
         else if (whoWin < 0)
         {
-            result = 2;
+            result = Player.TWO;
         }
 
         return result;
@@ -195,24 +202,19 @@ public class OnGameFightLogic : MonoBehaviour
 
     IEnumerator FinalizeGrabBattle()
     {
-        int winner = 0;
+        Player winner = Player.NONE;
         yield return new WaitForSeconds(3);
         winner = DecideWhoWinGrabBattle();
 
-        
+
 
         yield return new WaitForSeconds(1);
 
-        if(winner == 1)
-        {
-            eventHandler.PushPlayer2();
-        } else if (winner == 2)
-        {
-            eventHandler.PushPlayer1();
-        } else {
-            eventHandler.PushPlayer1();
-            eventHandler.PushPlayer2();
-        }
+        eventHandler.TellPlayersWhoWinGrabBattle(winner);
+
+        // Este yield es para que salgan de la colision antes de volver al ON_GAME
+        // y asi no se compruebe devuelta las condiciones para entrar al GRAB_BATTLE
+        yield return new WaitForSeconds(1);
 
         ChangeState(State.ON_GAME);
     }

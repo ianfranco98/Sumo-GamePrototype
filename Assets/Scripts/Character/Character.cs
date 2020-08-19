@@ -89,10 +89,10 @@ public class Character : MonoBehaviour
         if (!_transitions.ContainsKey(transition))
         {
             PlayerStateMachine.State _zero = (PlayerStateMachine.State) transition[0];
-            PlayerStateMachine.State _one = (PlayerStateMachine.State) transition[1];
+            PlayerStateMachine.Event _one = (PlayerStateMachine.Event) transition[1];
             string zero = _zero.ToString();
             string one = _one.ToString();
-            Debug.LogWarning(gameObject.name + ": Invalid transition " + zero + " " + one);
+            Debug.LogWarning(gameObject.name + ": Invalid transition state " + zero + " to event " + one);
             return;
         }
 

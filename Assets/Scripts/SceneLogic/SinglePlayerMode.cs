@@ -75,6 +75,9 @@ public class SinglePlayerMode : GameMode
                 // Mostrar pantalla de pelea finalizada: quien gano y eso.
                 // Mostrar opciones de revancha y volver al menú inicial.
                 break;
+            case OnGameFightLogic.State.GRAB_BATTLE:
+                cam.GrabBattleSwing();
+            break;
         }
     }
 }

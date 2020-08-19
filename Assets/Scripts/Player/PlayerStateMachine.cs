@@ -9,8 +9,8 @@ using DG.Tweening;
 // por si sola.
 
 public class PlayerStateMachine : Character
-{   
-    int pushCount; 
+{
+    int pushCount;
     float pushForce;
     float pushDecreasementCount;
     public float pushDistanceScalar = 7;
@@ -68,7 +68,7 @@ public class PlayerStateMachine : Character
         _transitions.Add(new int[] { (int)State.FREE_PUSH, (int)Event.GRAB }, (int)State.GRABBING);
 
         _transitions.Add(new int[] { (int)State.GRABBING, (int)Event.WIN_GRAB }, (int)State.FOCUS_PUSH);
-        _transitions.Add(new int[] { (int)State.GRABBING, (int)Event.LOSE_GRAB }, (int)State.FREE_MOVE);
+        _transitions.Add(new int[] { (int)State.GRABBING, (int)Event.LOSE_GRAB }, (int)State.PUSHED);
         _transitions.Add(new int[] { (int)State.GRABBING, (int)Event.TIED_GRAB }, (int)State.REVERT_PREVIOUS_MOVE);
 
         enabled = false;
@@ -120,6 +120,11 @@ public class PlayerStateMachine : Character
             case (int)State.LOSE:
                 // TODO: Armar una animación para esto.
                 break;
+            case (int)State.GRABBING:
+                pushForce = 0;
+                transform.DOKill();
+                //characterController.Move(lastMovInputDirection * 0.01f);
+                break;
             case (int)State.REVERT_PREVIOUS_MOVE:
                 ForceChangeState((int)lastMotionType);
                 pushForce = 0;
@@ -144,6 +149,7 @@ public class PlayerStateMachine : Character
                 break;
             case (int)State.FREE_PUSH:
                 DecreasePushForce();
+                //Debug.Log(pushForce);
                 break;
             case (int)State.FOCUS_PUSH:
                 DecreasePushForce();
@@ -216,9 +222,8 @@ public class PlayerStateMachine : Character
     void GoToOriginalPositionCompleted()
     {
         transform.DOLookAt(opponentTransform.position, 0.3f);
-        lastMovInputDirection = Vector3.zero;
         characterController.enabled = true;
-        ForceChangeState((int)State.FREE_MOVE);
+        ForceChangeState((int)State.FOCUS_MOVE);
         //Debug.Log(originalPosition);
     }
 

@@ -31,10 +31,48 @@ public class PlayersEventHandler : MonoBehaviour
         enabled = true;
     }
 
+
+    // Temporal code for test grab battle
+    void Update()
+    {
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            playerTwoSM.ChangeState((int)PlayerStateMachine.Event.PUSH);
+        }
+    }
+    //
+
     public virtual void PositionPlayersToOrigin()
     {
         playerOneSM.GoToOriginalPosition();
         playerTwoSM.GoToOriginalPosition();
+    }
+
+    public virtual void TellPlayersGrabBattleIsStarting()
+    {
+        playerOneSM.ChangeState((int)PlayerStateMachine.Event.GRAB);
+        playerTwoSM.ChangeState((int)PlayerStateMachine.Event.GRAB);
+    }
+
+    public virtual void TellPlayersWhoWinGrabBattle(OnGameFightLogic.Player p)
+    {
+
+        switch (p)
+        {
+            case OnGameFightLogic.Player.ONE:
+                playerOneSM.ChangeState((int)PlayerStateMachine.Event.WIN_GRAB);
+                playerTwoSM.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                break;
+            case OnGameFightLogic.Player.TWO:
+                playerOneSM.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                playerTwoSM.ChangeState((int)PlayerStateMachine.Event.WIN_GRAB);
+                break;
+            case OnGameFightLogic.Player.BOTH:
+                playerOneSM.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                playerTwoSM.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                break;
+        }
+
     }
 
     public virtual void TellPlayersWhoWin(OnGameFightLogic.Player p)

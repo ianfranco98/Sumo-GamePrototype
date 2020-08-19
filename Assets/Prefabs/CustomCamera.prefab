@@ -56,7 +56,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 100
   field of view: 60
   orthographic: 1
   orthographic size: 12
@@ -129,4 +129,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerOne: {fileID: 0}
   playerTwo: {fileID: 0}
-  manualConnection: 0
+  smoothEnabled: 0
+  smoothVel: 0
+  zoomVel: 0
