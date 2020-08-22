@@ -16,7 +16,7 @@ public class InputBehaviour : MonoBehaviour
         leanSelectable = checkComp == null ? gameObject.AddComponent(typeof(LeanSelectable)) as LeanSelectable : checkComp;
 
         leanSelectable.OnSelect.AddListener(JustPressed);
-        leanSelectable.OnSelectSet.AddListener(Pressed);
+        leanSelectable.OnSelectUpdate.AddListener(Pressed);
         leanSelectable.OnSelectUp.AddListener(JustReleased);
         leanSelectable.OnDeselect.AddListener(Released);
     }

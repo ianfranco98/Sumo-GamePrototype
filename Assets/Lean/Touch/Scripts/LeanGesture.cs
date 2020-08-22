@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Lean.Common;
 
 namespace Lean.Touch
 {
@@ -510,7 +511,7 @@ namespace Lean.Touch
 
 			if (wheelSensitivity != 0.0f)
 			{
-				var scroll = Input.mouseScrollDelta.y;
+				var scroll = LeanInput.GetMouseWheelDelta();
 
 				if (scroll > 0.0f)
 				{
@@ -559,7 +560,7 @@ namespace Lean.Touch
 
 			if (wheelSensitivity != 0.0f)
 			{
-				var scroll = Input.mouseScrollDelta.y;
+				var scroll = LeanInput.GetMouseWheelDelta();
 
 				if (scroll > 0.0f)
 				{

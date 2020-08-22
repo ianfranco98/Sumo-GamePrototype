@@ -24,9 +24,9 @@ namespace Lean.Touch
 	{
 		public const string ComponentPathPrefix = LeanHelper.ComponentPathPrefix + "Touch/Lean ";
 
-		public const string HelpUrlPrefix = "http://carloswilkes.github.io/Documentation/LeanTouch#";
+		public const string HelpUrlPrefix = "https://carloswilkes.github.io/Documentation/LeanTouch#";
 
-		public const string PlusHelpUrlPrefix = "http://carloswilkes.github.io/Documentation/LeanTouchPlus#";
+		public const string PlusHelpUrlPrefix = "https://carloswilkes.github.io/Documentation/LeanTouchPlus#";
 
 		/// <summary>This contains all the active and enabled LeanTouch instances</summary>
 		public static List<LeanTouch> Instances = new List<LeanTouch>();
@@ -41,7 +41,7 @@ namespace Lean.Touch
 		public static event System.Action<LeanFinger> OnFingerDown;
 
 		/// <summary>This gets fired every frame a finger is touching the screen (LeanFinger = The current finger)</summary>
-		public static event System.Action<LeanFinger> OnFingerSet;
+		public static event System.Action<LeanFinger> OnFingerUpdate;
 
 		/// <summary>This gets fired when a finger stops touching the screen (LeanFinger = The current finger)</summary>
 		public static event System.Action<LeanFinger> OnFingerUp;
@@ -398,8 +398,7 @@ namespace Lean.Touch
 
 		private static LeanFinger simulatedTapFinger = new LeanFinger();
 
-		/// <summary>This allows you to simulate a tap on the screen at the specified location.
-		/// NOTE: The tap events will events execute the next time LeanTouch updates, which may be the next frame.</summary>
+		/// <summary>This allows you to simulate a tap on the screen at the specified location.</summary>
 		public static void SimulateTap(Vector2 screenPosition, float pressure = 1.0f, int tapCount = 1)
 		{
 			if (OnFingerTap != null)
@@ -425,10 +424,9 @@ namespace Lean.Touch
 				OnFingerTap(simulatedTapFinger);
 			}
 		}
-
-		protected virtual void Awake()
-		{
 #if UNITY_EDITOR
+		protected virtual void Reset()
+		{
 			// Set the finger texture?
 			if (FingerTexture == null)
 			{
@@ -441,9 +439,8 @@ namespace Lean.Touch
 					FingerTexture = AssetDatabase.LoadMainAssetAtPath(path) as Texture2D;
 				}
 			}
-#endif
 		}
-
+#endif
 		protected virtual void OnEnable()
 		{
 			Instances.Add(this);
@@ -456,6 +453,12 @@ namespace Lean.Touch
 
 		protected virtual void Update()
 		{
+#if UNITY_EDITOR
+			if (Application.isPlaying == false)
+			{
+				return;
+			}
+#endif
 			// Only run the update methods if this is the first instance (i.e. if your scene has more than one LeanTouch component, only use the first)
 			if (Instances[0] == this)
 			{
@@ -476,14 +479,14 @@ namespace Lean.Touch
 		protected virtual void OnGUI()
 		{
 			// Show simulated multi fingers?
-			if (FingerTexture != null && Input.touchCount == 0 && Fingers.Count > 1)
+			if (FingerTexture != null && Fingers.Count > 1)
 			{
 				for (var i = Fingers.Count - 1; i >= 0; i--)
 				{
 					var finger = Fingers[i];
 
-					// Don't show fingers that just went up, because real touches will be up the frame they release
-					if (finger.Up == false)
+					// Simulated fingers have a negative index
+					if (finger.Index < 0)
 					{
 						var screenPosition = finger.ScreenPosition;
 						var screenRect     = new Rect(0, 0, FingerTexture.width, FingerTexture.height);
@@ -597,58 +600,55 @@ namespace Lean.Touch
 		private void PollFingers()
 		{
 			// Update real fingers
-			if (Input.touchCount > 0)
+			if (LeanInput.GetTouchCount() > 0)
 			{
-				for (var i = 0; i < Input.touchCount; i++)
+				for (var i = 0; i < LeanInput.GetTouchCount(); i++)
 				{
-					var touch = Input.GetTouch(i);
-					var set   = touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved;
+					int id; Vector2 position; float pressure; bool set;
 
-					AddFinger(touch.fingerId, touch.position, touch.pressure, set);
+					LeanInput.GetTouch(i, out id, out position, out pressure, out set);
+
+					AddFinger(id, position, pressure, set);
 				}
 			}
 			// If there are no real touches, simulate some from the mouse?
-			else
+			else if (LeanInput.GetMouseExists() == true)
 			{
 				var mouseSet = false;
 				var mouseUp  = false;
 
-				for (var i = 0; i < 4; i++)
+				for (var i = 0; i < 5; i++)
 				{
-					mouseSet |= Input.GetMouseButton(i);
-					mouseUp  |= Input.GetMouseButtonUp(i);
+					mouseSet |= LeanInput.GetMousePressed(i);
+					mouseUp  |= LeanInput.GetMouseUp(i);
 				}
 
 				if (mouseSet == true || mouseUp == true)
 				{
-					//var screen        = new Rect(0, 0, Screen.width, Screen.height);
-					var mousePosition = (Vector2)Input.mousePosition;
+					var mousePosition = LeanInput.GetMousePosition();
 
 					// Is the mouse within the screen?
-					//if (screen.Contains(mousePosition) == true)
+					//if (new Rect(0, 0, Screen.width, Screen.height).Contains(mousePosition) == true)
 					{
 						AddFinger(-1, mousePosition, 1.0f, mouseSet);
 
 						// Simulate pinch & twist?
-						if (SimulateMultiFingers == true)
+						if (SimulateMultiFingers == true && LeanInput.GetKeyboardExists() == true)
 						{
-							//var finger0 = FindFinger(0);
-
-							if (Input.GetKey(MovePivotKey) == true)
+							if (LeanInput.GetPressed(MovePivotKey) == true)
 							{
 								pivot.x = mousePosition.x / Screen.width;
 								pivot.y = mousePosition.y / Screen.height;
 							}
 
-							if (Input.GetKey(PinchTwistKey) == true)
+							if (LeanInput.GetPressed(PinchTwistKey) == true)
 							{
 								var center = new Vector2(Screen.width * pivot.x, Screen.height * pivot.y);
 
 								AddFinger(-2, center - (mousePosition - center), 1.0f, mouseSet);
-								//AddFinger(-2, finger0.StartScreenPosition - finger0.SwipeScreenDelta, 1.0f);
 							}
 							// Simulate multi drag?
-							else if (Input.GetKey(MultiDragKey) == true)
+							else if (LeanInput.GetPressed(MultiDragKey) == true)
 							{
 								AddFinger(-2, mousePosition, 1.0f, mouseSet);
 							}
@@ -668,11 +668,11 @@ namespace Lean.Touch
 				{
 					var finger = Fingers[i];
 
-					if (finger.Tap   == true && OnFingerTap   != null) OnFingerTap(finger);
-					if (finger.Swipe == true && OnFingerSwipe != null) OnFingerSwipe(finger);
-					if (finger.Down  == true && OnFingerDown  != null) OnFingerDown(finger);
-					if (finger.Set   == true && OnFingerSet   != null) OnFingerSet(finger);
-					if (finger.Up    == true && OnFingerUp    != null) OnFingerUp(finger);
+					if (finger.Tap   == true && OnFingerTap    != null) OnFingerTap(finger);
+					if (finger.Swipe == true && OnFingerSwipe  != null) OnFingerSwipe(finger);
+					if (finger.Down  == true && OnFingerDown   != null) OnFingerDown(finger);
+					if (                        OnFingerUpdate != null) OnFingerUpdate(finger);
+					if (finger.Up    == true && OnFingerUp     != null) OnFingerUp(finger);
 				}
 
 				if (OnGesture != null)

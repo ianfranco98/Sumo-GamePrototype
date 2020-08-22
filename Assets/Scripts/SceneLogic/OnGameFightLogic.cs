@@ -187,6 +187,7 @@ public class OnGameFightLogic : MonoBehaviour
         int pushCountP1 = eventHandler.GetPushCountP1();
         int pushCountP2 = eventHandler.GetPushCountP2();
         int whoWin = pushCountP1 - pushCountP2;
+        //Debug.Log("--" +pushCountP1 + " " + pushCountP2 + " " + whoWin);
         Player result = Player.BOTH;
         if (whoWin > 0)
         {
@@ -196,17 +197,16 @@ public class OnGameFightLogic : MonoBehaviour
         {
             result = Player.TWO;
         }
-
+        
         return result;
     }
 
     IEnumerator FinalizeGrabBattle()
     {
-        Player winner = Player.NONE;
         yield return new WaitForSeconds(3);
-        winner = DecideWhoWinGrabBattle();
+        Player winner = DecideWhoWinGrabBattle();
 
-
+        
 
         yield return new WaitForSeconds(1);
 

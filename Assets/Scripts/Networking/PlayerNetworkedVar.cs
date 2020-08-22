@@ -62,6 +62,7 @@ public class PlayerNetworkedVar : NetworkedBehaviour
 
     public int GetState() => _state;
     public float GetCurrentForce() => force.Value;
+    public int GetPushCount() => _pushCount;
 
     // A pedido del host
     public void UpdatePushCount() => InvokeClientRpcOnEveryoneExcept(RequestPushCount, NetworkingManager.Singleton.LocalClientId);

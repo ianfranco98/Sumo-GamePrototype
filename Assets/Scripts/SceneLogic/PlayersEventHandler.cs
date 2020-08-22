@@ -94,9 +94,6 @@ public class PlayersEventHandler : MonoBehaviour
         }
     }
 
-    public void PushPlayer1() => playerOneSM.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
-    public virtual void PushPlayer2() => playerTwoSM.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
-
     public virtual int WhoHasGotStrongestPush()
     {
         float p1Force = playerOneSM.GetCurrentForce();
@@ -115,11 +112,13 @@ public class PlayersEventHandler : MonoBehaviour
         return winner;
     }
 
+    public void PushPlayer1() => playerOneSM.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
+    public virtual void PushPlayer2() => playerTwoSM.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
     public Transform GetP1Transform() => playerOne;
     public Transform GetP2Transform() => playerTwo;
     public Vector3 GetDirectionVector() => (GetP1Transform().position - GetP2Transform().position).normalized;
     public int GetPushCountP1() => playerOneSM.GetPushCount();
-    public virtual int GetPushCountP2() => playerOneSM.GetPushCount();
+    public virtual int GetPushCountP2() => playerTwoSM.GetPushCount();
     public virtual bool PlayersAreColliding() => Vector3.Distance(playerOne.position, playerTwo.position) <= minDistCollision;
     public bool OutOfArenaP1() => Vector3.Distance(playerOne.position, arenaCenter) > arenaRadius;
     public bool OutOfArenaP2() => Vector3.Distance(playerTwo.position, arenaCenter) > arenaRadius;

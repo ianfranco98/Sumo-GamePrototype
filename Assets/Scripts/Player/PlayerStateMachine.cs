@@ -103,6 +103,7 @@ public class PlayerStateMachine : Character
 
                 break;
             case (int)State.FOCUS_PUSH:
+                pushCount = 0;
                 pushForce = 1;
                 pushDecreasementCount = 0;
                 Vector3 dir = opponentTransform.position - transform.position;
@@ -111,6 +112,8 @@ public class PlayerStateMachine : Character
 
                 break;
             case (int)State.PUSHED:
+                pushCount = 0;
+                transform.DOKill();
                 transform.DOMove(transform.position + -GetOpponentDirection() * pushedDistanceScalar, pushedTime).OnComplete(PushedComplete);
                 break;
             case (int)State.WIN:

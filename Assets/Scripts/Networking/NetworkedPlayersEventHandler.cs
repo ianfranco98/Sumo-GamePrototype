@@ -13,7 +13,8 @@ public class NetworkedPlayersEventHandler : PlayersEventHandler
 {
     PlayerNetworkedVar playerTwoNET;
 
-    public override void Setup(Transform playerOne, Transform playerTwo, Vector3 arenaCenter = new Vector3()){
+    public override void Setup(Transform playerOne, Transform playerTwo, Vector3 arenaCenter = new Vector3())
+    {
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
 
@@ -27,43 +28,82 @@ public class NetworkedPlayersEventHandler : PlayersEventHandler
         enabled = true;
     }
 
-    public override void PositionPlayersToOrigin(){
+    public override void PositionPlayersToOrigin()
+    {
         playerOneSM.GoToOriginalPosition();
         playerTwoNET.GoToOriginalPosition();
     }
 
-    public override void TellPlayersWhoWin(OnGameFightLogic.Player p){
-        switch(p){
+    public override void TellPlayersGrabBattleIsStarting()
+    {
+        playerOneSM.ChangeState((int)PlayerStateMachine.Event.GRAB);
+        playerTwoNET.ChangeState((int)PlayerStateMachine.Event.GRAB);
+    }
+
+    public override void TellPlayersWhoWinGrabBattle(OnGameFightLogic.Player p)
+    {
+
+        switch (p)
+        {
             case OnGameFightLogic.Player.ONE:
-                playerOneSM.ForceChangeState((int) PlayerStateMachine.State.WIN);
-                playerTwoNET.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-            break;
+                playerOneSM.ChangeState((int)PlayerStateMachine.Event.WIN_GRAB);
+                playerTwoNET.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                break;
             case OnGameFightLogic.Player.TWO:
-                playerOneSM.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-                playerTwoNET.ForceChangeState((int) PlayerStateMachine.State.WIN);
-            break;
+                playerOneSM.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                playerTwoNET.ChangeState((int)PlayerStateMachine.Event.WIN_GRAB);
+                break;
             case OnGameFightLogic.Player.BOTH:
-                playerOneSM.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-                playerTwoNET.ForceChangeState((int) PlayerStateMachine.State.LOSE);
-            break;
+                playerOneSM.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                playerTwoNET.ChangeState((int)PlayerStateMachine.Event.LOSE_GRAB);
+                break;
+        }
+
+    }
+
+    public override void TellPlayersWhoWin(OnGameFightLogic.Player p)
+    {
+        switch (p)
+        {
+            case OnGameFightLogic.Player.ONE:
+                playerOneSM.ForceChangeState((int)PlayerStateMachine.State.WIN);
+                playerTwoNET.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                break;
+            case OnGameFightLogic.Player.TWO:
+                playerOneSM.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                playerTwoNET.ForceChangeState((int)PlayerStateMachine.State.WIN);
+                break;
+            case OnGameFightLogic.Player.BOTH:
+                playerOneSM.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                playerTwoNET.ForceChangeState((int)PlayerStateMachine.State.LOSE);
+                break;
         }
     }
 
-    public override void PushPlayer2() => playerTwoNET.ChangeState((int) PlayerStateMachine.Event.BEING_PUSHED);
+    public override int GetPushCountP2(){
+        playerTwoNET.UpdatePushCount();
+        return playerTwoNET.GetPushCount();
+    }
 
-    public override int WhoHasGotStrongestPush(){
+    public override void PushPlayer2() => playerTwoNET.ChangeState((int)PlayerStateMachine.Event.BEING_PUSHED);
+
+    public override int WhoHasGotStrongestPush()
+    {
         float p1Force = playerOneSM.GetCurrentForce();
         float p2Force = playerTwoNET.GetCurrentForce();
 
         int winner = 0;
 
-        if (p1Force > p2Force + tieRange){
+        if (p1Force > p2Force + tieRange)
+        {
             winner = 1;
-        } else if (p2Force > p1Force + tieRange){
+        }
+        else if (p2Force > p1Force + tieRange)
+        {
             winner = 2;
         }
         return winner;
     }
-    
-    public override bool IsAttackingP2() => (PlayerStateMachine.State) playerTwoNET.GetState() == PlayerStateMachine.State.FREE_PUSH || (PlayerStateMachine.State) playerTwoNET.GetState() == PlayerStateMachine.State.FOCUS_PUSH;
+
+    public override bool IsAttackingP2() => (PlayerStateMachine.State)playerTwoNET.GetState() == PlayerStateMachine.State.FREE_PUSH || (PlayerStateMachine.State)playerTwoNET.GetState() == PlayerStateMachine.State.FOCUS_PUSH;
 }

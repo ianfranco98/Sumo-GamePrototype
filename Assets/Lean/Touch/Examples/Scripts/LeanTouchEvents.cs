@@ -11,23 +11,23 @@ namespace Lean.Touch
 		protected virtual void OnEnable()
 		{
 			// Hook into the events we need
-			LeanTouch.OnFingerDown  += HandleFingerDown;
-			LeanTouch.OnFingerSet   += HandleFingerSet;
-			LeanTouch.OnFingerUp    += HandleFingerUp;
-			LeanTouch.OnFingerTap   += HandleFingerTap;
-			LeanTouch.OnFingerSwipe += HandleFingerSwipe;
-			LeanTouch.OnGesture     += HandleGesture;
+			LeanTouch.OnFingerDown   += HandleFingerDown;
+			LeanTouch.OnFingerUpdate += HandleFingerUpdate;
+			LeanTouch.OnFingerUp     += HandleFingerUp;
+			LeanTouch.OnFingerTap    += HandleFingerTap;
+			LeanTouch.OnFingerSwipe  += HandleFingerSwipe;
+			LeanTouch.OnGesture      += HandleGesture;
 		}
 
 		protected virtual void OnDisable()
 		{
 			// Unhook the events
-			LeanTouch.OnFingerDown  -= HandleFingerDown;
-			LeanTouch.OnFingerSet   -= HandleFingerSet;
-			LeanTouch.OnFingerUp    -= HandleFingerUp;
-			LeanTouch.OnFingerTap   -= HandleFingerTap;
-			LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
-			LeanTouch.OnGesture     -= HandleGesture;
+			LeanTouch.OnFingerDown   -= HandleFingerDown;
+			LeanTouch.OnFingerUpdate -= HandleFingerUpdate;
+			LeanTouch.OnFingerUp     -= HandleFingerUp;
+			LeanTouch.OnFingerTap    -= HandleFingerTap;
+			LeanTouch.OnFingerSwipe  -= HandleFingerSwipe;
+			LeanTouch.OnGesture      -= HandleGesture;
 		}
 
 		public void HandleFingerDown(LeanFinger finger)
@@ -35,7 +35,7 @@ namespace Lean.Touch
 			Debug.Log("Finger " + finger.Index + " began touching the screen");
 		}
 
-		public void HandleFingerSet(LeanFinger finger)
+		public void HandleFingerUpdate(LeanFinger finger)
 		{
 			Debug.Log("Finger " + finger.Index + " is still touching the screen");
 		}

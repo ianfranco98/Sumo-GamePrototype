@@ -1,17 +1,17 @@
 ﻿using System.Collections;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using EventSystem = UnityEngine.EventSystems.EventSystem;
 
 namespace Lean.Common
 {
 	/// <summary>This class contains useful methods used in almost all <b>LeanTouch</b> code.</summary>
 	public static class LeanHelper
 	{
-		public const string HelpUrlPrefix = "http://carloswilkes.github.io/Documentation/";
+		public const string HelpUrlPrefix = "https://carloswilkes.github.io/Documentation/";
 
 		public const string ComponentPathPrefix = "Lean/";
 #if UNITY_EDITOR
@@ -27,11 +27,11 @@ namespace Lean.Common
 			}
 
 			path = AssetDatabase.GenerateUniqueAssetPath(path + "/" + name + ".prefab");
-#if UNITY_2018_3_OR_NEWER
+	#if UNITY_2018_3_OR_NEWER
 			var prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, path);
-#else
+	#else
 			var prefab = PrefabUtility.CreatePrefab(path, gameObject);
-#endif
+	#endif
 			Object.DestroyImmediate(gameObject);
 
 			Selection.activeObject = prefab;
@@ -65,7 +65,11 @@ namespace Lean.Common
 					// Make event system?
 					if (EventSystem.current == null)
 					{
-						new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+#if ENABLE_INPUT_SYSTEM
+						new GameObject("EventSystem", typeof(EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
+#else
+						new GameObject("EventSystem", typeof(EventSystem), typeof(UnityEngine.EventSystems.StandaloneInputModule));
+#endif
 					}
 				}
 

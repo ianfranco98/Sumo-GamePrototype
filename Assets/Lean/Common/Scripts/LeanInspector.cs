@@ -10,13 +10,11 @@ namespace Lean.Common
 	public class LeanInspector<T> : Editor
 		where T : Object
 	{
-		protected T Target;
+		protected T tgt;
 
-		protected T[] Targets;
+		protected T[] tgts;
 
 		private static readonly string[] propertyToExclude = new string[] { "m_Script" };
-
-		private static List<Color> colors = new List<Color>();
 
 		private static GUIContent customContent = new GUIContent();
 		
@@ -24,23 +22,14 @@ namespace Lean.Common
 
 		public static void BeginError(bool error)
 		{
-			BeginError(error, Color.red);
-		}
+			var rect = EditorGUILayout.BeginVertical(GUIStyle.none);
 
-		public static void BeginError(bool error, Color color)
-		{
-			colors.Add(GUI.color);
-
-			GUI.color = error == true ? color : colors[0];
+			EditorGUI.DrawRect(rect, error == true ? Color.red : Color.clear);
 		}
 
 		public static void EndError()
 		{
-			var index = colors.Count - 1;
-
-			GUI.color = colors[index];
-
-			colors.RemoveAt(index);
+			EditorGUILayout.EndVertical();
 		}
 
 		public static Rect Reserve()
@@ -54,34 +43,32 @@ namespace Lean.Common
 
 		public override void OnInspectorGUI()
 		{
-			colors.Clear();
-
-			Target  = (T)target;
-			Targets = targets.Select(t => (T)t).ToArray();
+			tgt  = (T)target;
+			tgts = targets.Select(t => (T)t).ToArray();
 
 			EditorGUI.BeginChangeCheck();
 			{
-				EditorGUILayout.Separator();
-
 				serializedObject.Update();
+
+				EditorGUILayout.Separator();
 
 				DrawInspector();
 
-				serializedObject.ApplyModifiedProperties();
-
 				EditorGUILayout.Separator();
+
+				serializedObject.ApplyModifiedProperties();
 			}
 			if (EditorGUI.EndChangeCheck() == true)
 			{
 				GUI.changed = true; Repaint();
 
-				Dirty();
+				//Dirty();
 			}
 		}
 
 		public virtual void OnSceneGUI()
 		{
-			Target = (T)target;
+			tgt = (T)target;
 
 			DrawScene();
 		}
@@ -90,10 +77,10 @@ namespace Lean.Common
 		{
 			if (dirty == true)
 			{
-				Undo.RecordObjects(Targets, "Inspector");
+				Undo.RecordObjects(tgts, "Inspector");
 			}
 
-			foreach (var t in Targets)
+			foreach (var t in tgts)
 			{
 				update(t);
 			}
@@ -106,7 +93,7 @@ namespace Lean.Common
 
 		protected bool Any(System.Func<T, bool> check)
 		{
-			foreach (var t in Targets)
+			foreach (var t in tgts)
 			{
 				if (check(t) == true)
 				{
@@ -119,7 +106,7 @@ namespace Lean.Common
 
 		protected bool All(System.Func<T, bool> check)
 		{
-			foreach (var t in Targets)
+			foreach (var t in tgts)
 			{
 				if (check(t) == false)
 				{
@@ -207,11 +194,6 @@ namespace Lean.Common
 			EditorGUI.showMixedValue = mixed;
 
 			return EditorGUI.EndChangeCheck();
-		}
-
-		protected bool DrawDefault(string propertyPath, string overrideTooltip = null, string overrideText = null)
-		{
-			return Draw(propertyPath, overrideTooltip, overrideText);
 		}
 
 		protected bool Draw(string propertyPath, string overrideTooltip = null, string overrideText = null)
