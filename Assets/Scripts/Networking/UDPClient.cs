@@ -15,10 +15,12 @@ class UDPClient : MonoBehaviour
     Thread udpClientThread;
     String key = "send";
 
+    [SerializeField]
+    SearchingDisplayBehaviour button;
+
     void Start()
     {
         networkModeHandler = gameObject.GetComponent<NetworkModeHandler>();
-
     }
 
     void OnDisable()
@@ -72,6 +74,7 @@ class UDPClient : MonoBehaviour
                     signalReceived = true;
 
                     networkModeHandler.SaveClientIPAddress(hostIP);
+                    button.HostFinded();
                 }
             }
             catch (Exception e)
@@ -80,7 +83,11 @@ class UDPClient : MonoBehaviour
             }
         }
 
-        if (!signalReceived) Debug.Log("Host no encontrado");
+        if (!signalReceived)
+        {
+            Debug.Log("Host no encontrado");
+            button.FindingHostFailed();
+        }
         EndThread();
     }
 

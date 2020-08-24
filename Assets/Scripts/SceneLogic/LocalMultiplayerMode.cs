@@ -30,8 +30,18 @@ public class LocalMultiplayerMode : GameMode
 
     private ulong opponentClientId;
 
+    GameObject searchingDisplay, selectModeDisplay, waitingDisplay;
+
     public void Start()
     {
+        
+        searchingDisplay = GameObject.Find("SearchingDisplay");
+        selectModeDisplay = GameObject.Find("SelectModeDisplay");
+        waitingDisplay = GameObject.Find("WaitingDisplay");
+
+        searchingDisplay.SetActive(false);
+        waitingDisplay.SetActive(false);
+
         GameObject leanTouch = GameObject.FindWithTag("LeanTouch");
         if (leanTouch == null) leanTouch = Instantiate(leanTouchPrefab);
 
@@ -41,9 +51,15 @@ public class LocalMultiplayerMode : GameMode
         cam = GameObject.Find("CustomCamera").GetComponent<CustomCamera>();
 
         inputManager = GameObject.Find("InputManager").GetComponent<InputManager>();
+        inputManager.Setup();
         networkModeHandler = GameObject.Find("NetworkingManager").GetComponent<NetworkModeHandler>();
 
         NetworkingManager.Singleton.OnClientDisconnectCallback += BackToInitialState;
+    }
+
+    public void EnableSearchingDisplay()
+    {
+        searchingDisplay.SetActive(true);
     }
 
     public void BackToInitialState(ulong client)
@@ -113,8 +129,10 @@ public class LocalMultiplayerMode : GameMode
         PlayerStateMachine playerSM = player.GetComponent<PlayerStateMachine>();
 
         playerSM.Setup();
-        inputManager.Setup(playerSM);
+        //inputManager.Setup(playerSM);
+        inputManager.SetPlayerReference(player.GetComponent<PlayerStateMachine>());
         inputManager.GameControllersSetActive(true);
+        
 
         cam.Setup(player.GetComponent<Transform>(), opponent.GetComponent<Transform>());
 
@@ -128,6 +146,7 @@ public class LocalMultiplayerMode : GameMode
     {
         if (NetworkingManager.Singleton.ConnectedClientsList.Count == 2)
         {
+            waitingDisplay.SetActive(false);
             StartCoroutine(DelayedInitializeHostGame());
 
         }
@@ -197,7 +216,8 @@ public class LocalMultiplayerMode : GameMode
 
             player.GetComponent<PlayerStateMachine>().Setup(opponent.transform);
 
-            inputManager.Setup(player.GetComponent<PlayerStateMachine>());
+            //inputManager.Setup(player.GetComponent<PlayerStateMachine>());
+            inputManager.SetPlayerReference(player.GetComponent<PlayerStateMachine>());
             inputManager.GameControllersSetActive(true);
 
             cam.Setup(opponent.GetComponent<Transform>(), player.GetComponent<Transform>());

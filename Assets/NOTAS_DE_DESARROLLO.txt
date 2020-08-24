@@ -125,7 +125,38 @@ njb24/7/2020 2:29hs ============================================================
 
       * Pensar en un título, bocetar diseño planear alguna animación con Text Mesh Pro.
 
--/-/2020 -:--hs ============================================================================================
-============================================================================================================
+22/8/2020 7:57hs ============================================================================================
+=============================================================================================================
+
+    Agregué varias cosas desde la última vez que escribí acá:
+
+      - Agregué Git al proyecto y lo subí a GitHub en un repositorio privado.
+      - Escribí código para el modo "Grab Battle".
+      - Actualicé LeanTouch y agregué LeanGUI.
+      - Agregué prefab de botón y los puse en el menú y el modo LAN, aunque le faltan animaciones.
+      - Agregué una nueva fuente tipográfica.
+      - Puse un shader "Toon" que encontré en internet, aunque no estoy convencido de mantenerlo.
+
+      Tambien modele un personaje en voxeles y lo animé con Mixamo pero no me gustó el resultado. 
+
+      Para hacer en un futuro cercano:
+
+      * Bocetar personajes (enemigos para el Single Player) y armar ideas para su jugabilidad.
+      * Investigar sobre AI para Enemigos o Jefes.
+
+24/8/2020 1:50hs ============================================================================================
+=============================================================================================================
+
+    Armé gran parte de la UI del modo multiplayer, me queda hacer una animación cuando se busca o espera un
+    oponente, animar el infoText (puntos suspensivos), cambiar el texto de la etiqueta de regresar y quizas
+    algún mensaje de error en el menú inicial cuando se interrumpa la conexión.
+
+
+--/-/2020 -:--hs ============================================================================================
+=============================================================================================================
+
+
+--/-/2020 -:--hs ============================================================================================
+=============================================================================================================
 
 
