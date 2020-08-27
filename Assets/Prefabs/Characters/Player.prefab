@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 3033665323658284078}
   - component: {fileID: 2855954345994655727}
   m_Layer: 0
-  m_Name: Prism
+  m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

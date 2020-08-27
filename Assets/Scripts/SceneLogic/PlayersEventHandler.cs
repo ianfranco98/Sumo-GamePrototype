@@ -37,7 +37,16 @@ public class PlayersEventHandler : MonoBehaviour
     {
         if(Input.GetKeyUp(KeyCode.Space))
         {
-            playerTwoSM.ChangeState((int)PlayerStateMachine.Event.PUSH);
+            if (playerTwoSM.GetState() != PlayerStateMachine.State.GRABBING)
+            {
+                playerTwoSM.ChangeState((int)PlayerStateMachine.Event.PUSH);
+            }
+            else
+            {
+                playerTwoSM.AddPushCount();
+                Debug.Log(playerTwoSM.GetPushCount());
+            }
+            //playerTwoSM.ChangeState((int)PlayerStateMachine.Event.PUSH);
         }
     }
     //

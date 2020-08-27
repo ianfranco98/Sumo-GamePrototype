@@ -90,6 +90,9 @@ public class PlayerStateMachine : Character
         switch (currentState)
         {
             case (int)State.FREE_MOVE:
+                //lastMovInputDirection = GetDirection();
+                Vector2 lastDir = GetOpponentDir();//GetArrowDirection();
+                lastMovInputDirection = new Vector3(lastDir.x, 0, lastDir.y);
                 lastMotionType = State.FREE_MOVE;
                 break;
             case (int)State.FOCUS_MOVE:
@@ -165,8 +168,6 @@ public class PlayerStateMachine : Character
 
     void ProcessMove()
     {
-
-
 
         if (movInputDirection == Vector3.zero)
         {

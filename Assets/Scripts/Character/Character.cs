@@ -24,6 +24,8 @@ public class Character : MonoBehaviour
 
     protected CharacterController characterController;
 
+    GameObject arrow;
+
     [SerializeField]
     protected Vector3 originalPosition;
 
@@ -62,6 +64,8 @@ public class Character : MonoBehaviour
             Debug.LogWarning(gameObject.name + ": Didn't find the model for this character. Default set is a new GameObject.Transform");
             modelTransform = new GameObject().transform;
         }
+
+        arrow = GameObject.Find("Arrow");
 
         enabled = true;
     }
@@ -114,6 +118,18 @@ public class Character : MonoBehaviour
         Vector3 dir = new Vector3(input.x, transform.position.y, input.y);
         transform.Translate(dir);
     }*/
+
+    protected Vector2 GetArrowDirection()
+    {
+        Vector2 v = new Vector2(arrow.transform.position.x, arrow.transform.position.z) - new Vector2(transform.position.x-0.5f, transform.position.z);
+        return v.normalized;
+    }
+
+    protected Vector2 GetOpponentDir()
+    {
+        Vector2 v = new Vector2(opponentTransform.position.x, opponentTransform.position.z) - new Vector2(transform.position.x, transform.position.z);
+        return v.normalized;
+    }
 }
 
 public class MyEqualityComparer : IEqualityComparer<int[]>
